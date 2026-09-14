@@ -21,3 +21,14 @@ def load_pemsh5(path: str):
     with h5py.File(path, "r") as f:
         if "speed/block0_values" in f:
             data = np.asarray(f["speed/block0_values"]).astype(np.float32)
+        else:
+            group = "block0_values" if "block0_values" in f else list(f.keys())[0]
+            data = np.asarray(f[group]).astype(np.float32)
+    return data
+
+
+def build_windows(data, history=HISTORY, horizons=HORIZONS, sensor_idx=0):
+    X, Y = [], []
+    for i in range(len(data) - history - max(horizons)):
+        X.append(data[i:i + history])
+        Y.append([data[i + history - 1 + h, sensor_idx] for h in horizons])
