@@ -32,3 +32,15 @@ def build_windows(data, history=HISTORY, horizons=HORIZONS, sensor_idx=0):
     for i in range(len(data) - history - max(horizons)):
         X.append(data[i:i + history])
         Y.append([data[i + history - 1 + h, sensor_idx] for h in horizons])
+    return torch.from_numpy(np.stack(X).astype(np.float32)), torch.from_numpy(np.asarray(Y, dtype=np.float32))
+
+
+class MultiHorizonDataset:
+    def __init__(self, data, history=HISTORY, horizons=HORIZONS, sensor_idx=0):
+        self.X, self.y = build_windows(data, history, horizons, sensor_idx)
+
+    def __len__(self):
+        return len(self.X)
+
+    def __getitem__(self, i):
+        return self.X[i], self.y[i]
