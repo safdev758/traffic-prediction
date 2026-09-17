@@ -27,3 +27,13 @@ class GraphGRU(nn.Module):
         self.gru = nn.GRU(hidden, hidden, batch_first=True)
         self.attn = nn.MultiheadAttention(hidden, num_heads=4, batch_first=True)
         self.head = nn.Linear(hidden, n_horizons)
+
+    def forward(self, x):
+        # x: (B, T, S)
+        B, T, S = x.shape
+        h = self.emb(x.transpose(1, 2).unsqueeze(-1))  # (B, T, S, hidden)
+        states, _ = self.gru(h.reshape(B * S, T, -1))  # (B*S, T, hidden)
+        last = states.reshape(B, S, T, -1)[:, :, -1]
+        attn_out, _ = self.attn(last, last, last)
+        pooled = attn_out.mean(dim=1)
+        return self.head(pooled)
