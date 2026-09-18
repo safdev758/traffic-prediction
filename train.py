@@ -52,3 +52,22 @@ def main():
             net.train()
             total = 0.0
             seen = 0
+            for xb, yb in train_loader:
+                xb, yb = xb.to(device), yb.to(device)
+                pred = net(xb)
+                loss = loss_fn(pred, yb)
+                opt.zero_grad(); loss.backward(); opt.step()
+                total += loss.item() * xb.size(0)
+                seen += xb.size(0)
+                steps += 1
+                if steps > args.max_steps:
+                    break
+            print(f"[TRAFFIC] {kind} epoch {epoch}/{args.epochs} sMAE={total/seen:.4f}")
+            if steps > args.max_steps:
+                break
+        net.eval()
+        per_hor = {h: [] for h in HORIZONS}
+        per_gt = {h: [] for h in HORIZONS}
+        with torch.no_grad():
+            for xb, yb in val_loader:
+                pred = net(xb.to(device))
