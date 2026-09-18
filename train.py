@@ -34,3 +34,21 @@ def main():
     n_train = int(n * 0.7)
     n_val = int(n * 0.15)
     train_ds = torch.utils.data.Subset(ds, range(n_train))
+    val_ds = torch.utils.data.Subset(ds, range(n_train, n_train + n_val))
+    train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, num_workers=2, pin_memory=True)
+    val_loader = DataLoader(val_ds, batch_size=args.batch_size, shuffle=False, num_workers=2, pin_memory=True)
+    metrics = {"meta": vars(args), "horizons_min": [h * 3 for h in HORIZONS], "samples": n}
+    y_scale = float(data.std())
+    y_mu = float(data.mean())
+    for kind in ("rnn", "lstm", "gru", "graph_gru"):
+        if kind == "graph_gru":
+            net = GraphGRU(args.hidden, len(HORIZONS)).to(device)
+        else:
+            net = RNNWrapper(kind, data.shape[1], args.hidden, len(HORIZONS)).to(device)
+        opt = torch.optim.AdamW(net.parameters(), lr=1e-3)
+        loss_fn = nn.SmoothL1Loss()
+        steps = 0
+        for epoch in range(1, args.epochs + 1):
+            net.train()
+            total = 0.0
+            seen = 0
