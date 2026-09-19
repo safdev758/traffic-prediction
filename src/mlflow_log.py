@@ -46,3 +46,15 @@ def main():
 
     data = json.loads(metrics_path.read_text())
     experiment = args.experiment or f"{args.project}_training"
+    mlflow.set_experiment(experiment)
+    with mlflow.start_run(run_name=args.kernel) as run:
+        for name, value in numeric_leaves(data):
+            mlflow.log_metric(name, value)
+        for name, value in all_leaves(data.get("meta", {})):
+            mlflow.log_param(name, value if isinstance(value, (str, int, float)) else json.dumps(value))
+        run_id = run.info.run_id
+    print(f"✅ logged run {run_id} into MLflow experiment: {experiment}")
+
+
+if __name__ == "__main__":
+    main()
