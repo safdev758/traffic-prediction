@@ -12,3 +12,15 @@ Sensor-network traffic speed forecasting: classic GateRecurrent baselines vs. a 
 |-------|-----------|----------|
 | RNN   | 86.29 | 39.58 |
 | GRU   | **83.21** | 42.74 |
+| GraphGRU | 84.41 | **37.60** |
+
+Full metrics: `output/run5/output/metrics.json`.
+
+## Layout
+```
+src/data.py    PEMS-BAY loader (load_pemsh5), MultiHorizonDataset
+src/models.py  RNNWrapper, GraphGRU (attention over adjacency row)
+train.py       end-to-end kernel script
+tests/         unit tests (loader, horizon windows)
+```
+
