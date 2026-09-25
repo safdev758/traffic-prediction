@@ -24,3 +24,6 @@ train.py       end-to-end kernel script
 tests/         unit tests (loader, horizon windows)
 ```
 
+## Kaggle
+Kernel: `traffic-prediction-v5` (GPU, dataset `scchuy/pemsbay`).
+
