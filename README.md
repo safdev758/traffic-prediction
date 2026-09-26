@@ -27,3 +27,9 @@ tests/         unit tests (loader, horizon windows)
 ## Kaggle
 Kernel: `traffic-prediction-v5` (GPU, dataset `scchuy/pemsbay`).
 
+## MLflow
+Experiment `traffic-prediction_training`.
+
+## Notes / limits
+- GraphGRU improves MAE (37.6 vs 39.6) but not RMSE — graph signal helps errors on typical timesteps, hurts tail.
+- Full DCRNN/STGCN-style message passing out of scope for the kernel budget.
