@@ -75,3 +75,18 @@ def main():
                     per_hor[h] += pred[:, j].cpu().tolist()
                     per_gt[h] += yb[:, j].tolist()
         per_rng = {}
+        for h in HORIZONS:
+            diff = (np.asarray(per_hor[h]) - np.asarray(per_gt[h])) * y_scale
+            rmse = float(np.sqrt(np.mean(diff ** 2)))
+            mae = float(np.mean(np.abs(diff)))
+            per_rng[h] = {"rmse": round(rmse, 2), "mae": round(mae, 2)}
+        per_rng["minutes"] = [int(h * 3) for h in HORIZONS]
+        metrics[kind] = per_rng
+        print(f"[TRAFFIC-EVAL] {kind}: {per_rng}")
+    Path("output").mkdir(exist_ok=True)
+    Path("output/metrics.json").write_text(json.dumps(metrics, indent=2))
+    print("FINAL:", json.dumps(metrics))
+
+
+if __name__ == "__main__":
+    main()

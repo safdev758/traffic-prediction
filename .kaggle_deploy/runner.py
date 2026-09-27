@@ -25,3 +25,13 @@ if os.path.exists("requirements.txt"):
     subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-q', '-r', 'requirements.txt'])
 
 
+
+print("\n🚀 Executing entrypoint: train.py ")
+print("=" * 60)
+cmd = [sys.executable, "train.py"]
+if "":
+    cmd.extend("".split())
+
+res = subprocess.run(cmd)
+print(f"🏁 Execution finished with returncode {res.returncode}")
+sys.exit(res.returncode)
